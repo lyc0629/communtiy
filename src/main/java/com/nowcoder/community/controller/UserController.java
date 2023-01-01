@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/user")
@@ -105,6 +107,46 @@ public class UserController {
             }
         } catch (IOException e) {
             logger.error("读取头像失败: " + e.getMessage());
+        }
+    }
+
+//    @RequestMapping(path = "/updatePassword",method = RequestMethod.POST)
+//    public String updatePassword(String oldPassword,String newPassword,Model model,@CookieValue("ticket") String ticket){
+//
+//        if (StringUtils.isBlank(oldPassword)){
+//            model.addAttribute("errorPassword","请输入密码");
+//            return "/site/setting";
+//        }
+//        if (oldPassword==newPassword){
+//            model.addAttribute("errorPassword","新久密码一致");
+//            return "/site/setting";
+//        }
+//        User user = hostHolder.getUser();
+//        String password=oldPassword+user.getSalt();
+//        String md5 = CommunityUtil.md5(password);
+//        if (md5 != user.getPassword()) {
+//            model.addAttribute("errorPassword","输入的密码不正确");
+//            return "/site/setting";
+//        }
+//        password=CommunityUtil.md5(newPassword+user.getSalt());
+//        userService.updatePassword(user.getId(),password);
+//
+//
+//        return "redirect:/logout";
+//
+//    }
+
+    // 修改密码
+    @RequestMapping(path = "/updatePassword", method = RequestMethod.POST)
+    public String updatePassword(String oldPassword, String newPassword, Model model) {
+        User user = hostHolder.getUser();
+        Map<String, Object> map = userService.updatePassword(user.getId(), oldPassword, newPassword);
+        if (map == null || map.isEmpty()) {
+            return "redirect:/logout";
+        } else {
+            model.addAttribute("oldPasswordMsg", map.get("oldPasswordMsg"));
+            model.addAttribute("newPasswordMsg", map.get("newPasswordMsg"));
+            return "/site/setting";
         }
     }
 

@@ -14,6 +14,7 @@ import javax.mail.internet.MimeMessage;
 @Component
 public class MailClient {
 
+
     private static final Logger logger = LoggerFactory.getLogger(MailClient.class);
 
     @Autowired
@@ -33,6 +34,8 @@ public class MailClient {
             mailSender.send(helper.getMimeMessage());
         } catch (MessagingException e) {
             logger.error("发送邮件失败:" + e.getMessage());
+
+
         }
     }
 
